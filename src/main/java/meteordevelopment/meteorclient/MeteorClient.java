@@ -27,6 +27,7 @@ import meteordevelopment.meteorclient.utils.misc.Version;
 import meteordevelopment.meteorclient.utils.misc.input.KeyAction;
 import meteordevelopment.meteorclient.utils.misc.input.KeyBinds;
 import meteordevelopment.meteorclient.utils.network.OnlinePlayers;
+import meteordevelopment.meteorclient.vfs.QuiltDir;
 import meteordevelopment.orbit.EventBus;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
@@ -36,11 +37,14 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
+import org.reflections.vfs.Vfs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URL;
 
 public class MeteorClient implements ClientModInitializer {
     public static final String MOD_ID = "meteor-client";
@@ -68,6 +72,22 @@ public class MeteorClient implements ClientModInitializer {
 
         VERSION = new Version(versionString);
         DEV_BUILD = MOD_META.getCustomValue(MeteorClient.MOD_ID + ":devbuild").getAsString();
+
+        // Quilt Support
+        try {
+            Class<?> QUILT_ZFS_PROVIDER = Class.forName("org.quiltmc.loader.impl.filesystem.QuiltZipFileSystemProvider");
+            LOG.info("Adding quilt ZFS");
+            Vfs.addDefaultURLTypes(new Vfs.UrlType() {
+                @Override
+                public boolean matches(URL url) {
+                    return "quilt.zfs".equals(url.getProtocol()) && Vfs.getFile(url).isDirectory();
+                }
+                @Override
+                public Vfs.Dir createDir(URL url) throws Exception {
+                    return new QuiltDir(QUILT_ZFS_PROVIDER.getDeclaredMethod("getPath", URI.class).invoke(QUILT_ZFS_PROVIDER.getDeclaredMethod("instance").invoke(null), url.toURI()));
+                }
+            });
+        } catch (ClassNotFoundException ignored) {}
     }
 
     @Override
