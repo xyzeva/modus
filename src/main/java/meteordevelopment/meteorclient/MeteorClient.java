@@ -26,6 +26,7 @@ import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.misc.Version;
 import meteordevelopment.meteorclient.utils.misc.input.KeyAction;
 import meteordevelopment.meteorclient.utils.misc.input.KeyBinds;
+import meteordevelopment.meteorclient.utils.network.MeteorExecutor;
 import meteordevelopment.meteorclient.utils.network.OnlinePlayers;
 import meteordevelopment.meteorclient.vfs.QuiltDir;
 import meteordevelopment.orbit.EventBus;
@@ -127,6 +128,12 @@ public class MeteorClient implements ClientModInitializer {
 
         // Pre init
         ReflectInit.init(PreInit.class);
+
+        if (MeteorExecutor.executor == null) {
+            LOG.error("Your way of loading mods is probably supported but is a different namespace, go yell at eva with the warnings above.");
+            LOG.error("Disabling");
+            return;
+        }
 
         // Register module categories
         Categories.init();
