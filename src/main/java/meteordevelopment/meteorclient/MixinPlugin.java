@@ -32,7 +32,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
     @Override
     public void onLoad(String mixinPackage) {
         if (loaded) return;
-
+        // TODO: The fuck?
         try {
             // Get class loader
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -83,26 +83,6 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (!mixinClassName.startsWith(mixinPackage)) {
-            throw new RuntimeException("Mixin " + mixinClassName + " is not in the mixin package");
-        }
-        else if (mixinClassName.endsWith("PlayerEntityRendererMixin")) {
-            return !isOriginsPresent;
-        }
-        else if (mixinClassName.startsWith(mixinPackage + ".sodium")) {
-            return isSodiumPresent;
-        }
-        else if (mixinClassName.startsWith(mixinPackage + ".indigo")) {
-            return isIndigoPresent;
-        }
-        else if (mixinClassName.startsWith(mixinPackage + ".canvas")) {
-            return isCanvasPresent;
-        }
-        else if (mixinClassName.startsWith(mixinPackage + ".lithium")) {
-            return isLithiumPresent;
-        }
-
-
         return true;
     }
 
